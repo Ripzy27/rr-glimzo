@@ -1,11 +1,13 @@
+import { CONTACT_EMAIL } from '../data/contact.ts'
+import { PRIVACY_HASH } from '../lib/routes.ts'
 import { SiteFooter } from '../components/SiteFooter.tsx'
 import { SiteHeader } from '../components/SiteHeader.tsx'
 
 export function PrivacyPage() {
   return (
     <>
-      <SiteHeader brandHref="index.html">
-        <a className="ghost" href="index.html#quote">
+      <SiteHeader brandHref="#">
+        <a className="ghost" href="#quote">
           Back to enquiries
         </a>
       </SiteHeader>
@@ -23,9 +25,9 @@ export function PrivacyPage() {
             Commercial requests also include your organisation.
           </p>
           <p>
-            Your entries are used in your browser to create a message for you to review and copy. Preparing or copying
-            a request does not send it to R&amp;R Glimzo and does not confirm a quote, site visit or booking. The forms
-            do not send their contents to a server or save them in a website database.
+            Your entries are used in your browser to create an email for you to review. Preparing a request does not
+            send it to R&amp;R Glimzo and does not confirm a quote, site visit or booking. The forms do not send their
+            contents to a server or save them in a website database.
           </p>
 
           <h2>Your device and copied information</h2>
@@ -40,11 +42,11 @@ export function PrivacyPage() {
             information and personal health details.
           </p>
 
-          <h2>Sending your request elsewhere</h2>
+          <h2>Sending your request</h2>
           <p>
-            If you paste the message into email or WhatsApp, that service handles it under its own privacy terms.
-            R&amp;R Glimzo receives your details only if you separately send them to the business. No email or WhatsApp
-            connection is currently enabled on these forms.
+            If you open the request in Gmail or paste it into an email, that service handles it under its own privacy
+            terms. R&amp;R Glimzo receives your details only if you send the email to {CONTACT_EMAIL}, and will use them
+            to reply to your enquiry.
           </p>
 
           <h2>Cookies and website access</h2>
@@ -54,27 +56,26 @@ export function PrivacyPage() {
             information. This notice describes the request forms; it does not replace those services’ notices.
           </p>
 
-          <h2>Before direct enquiries are enabled</h2>
+          <h2>How received enquiries are kept</h2>
           <p>
-            R&amp;R Glimzo’s business contact details and information about how received enquiries are used, stored
-            and shared will be added before direct form submission is enabled. This will include the relevant lawful
-            basis, retention periods and how to exercise your data protection rights.
+            Emails you send arrive in R&amp;R Glimzo’s inbox. Information about the lawful basis for using them, how
+            long they are kept and how to exercise your data protection rights will be added to this notice.
           </p>
 
           <h2>Privacy questions</h2>
           <p>
             You can find independent information about your rights and how to raise a concern on the{' '}
-            <a href="https://ico.org.uk/for-the-public/">Information Commissioner’s Office website</a>. The business’s
-            privacy contact will be published with its contact details.
+            <a href="https://ico.org.uk/for-the-public/">Information Commissioner’s Office website</a>. You can also contact the
+            business at {CONTACT_EMAIL}.
           </p>
           <p>
-            <a href="index.html#quote">Return to the enquiry forms</a>
+            <a href="#quote">Return to the enquiry forms</a>
           </p>
         </article>
       </main>
       <SiteFooter>
-        <a href="index.html">Home</a>
-        <a href="privacy.html" aria-current="page">
+        <a href="#">Home</a>
+        <a href={PRIVACY_HASH} aria-current="page">
           Privacy notice
         </a>
       </SiteFooter>

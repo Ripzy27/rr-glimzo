@@ -1,17 +1,9 @@
+import { DOMESTIC_SERVICES } from '../data/options.ts'
 import { RequestLink } from '../requests/RequestLink.tsx'
 
-const MORE_SERVICES = [
-  'Regular domestic cleaning',
-  'Deep cleaning',
-  'Carpet cleaning',
-  'After-building cleaning',
-  'Eco-friendly cleaning',
-  'One-off cleaning',
-  'Housekeeping',
-  'Ironing',
-  'Upholstery cleaning',
-  'Mattress cleaning',
-]
+const MORE_SERVICES = DOMESTIC_SERVICES.filter(
+  name => name !== 'End of tenancy cleaning' && name !== 'Several services / advice needed',
+)
 
 export function Services() {
   return (

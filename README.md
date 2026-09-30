@@ -18,15 +18,15 @@ npm run lint
 ## Deploying
 
 `npm run build` produces a static site in `dist/`. Upload the **contents** of `dist/`
-(`index.html`, `privacy.html` and the `assets/` folder) to your server's web root, or any
+(`index.html` and the `assets/` folder) to your server's web root, or any
 subfolder, because asset paths are relative. No server-side runtime is needed.
 
 ## Project layout
 
 ```
-index.html, privacy.html   Page shells (title, meta, favicon) — Vite entry points
+index.html                 Page shell (title, meta, favicon) — Vite entry point
 src/main.tsx               Home page entry
-src/privacy.tsx            Privacy page entry
+src/App.tsx                Hash routing between the home and privacy pages (#privacy)
 src/pages/                 HomePage, PrivacyPage
 src/components/            Page sections and form fields
 src/requests/              Request panels/forms: open state, pre-selection, copy flow
@@ -38,15 +38,13 @@ src/assets/                Logo
 
 ## Current enquiry behaviour
 
-The forms validate entries and prepare a message that the visitor can copy.
-They do not send emails, submit to WhatsApp, save customer details to a server,
-or confirm bookings. An email/WhatsApp destination or backend form service still
-needs to be connected before customers can send enquiries through the website.
+The forms validate entries and prepare an email addressed to the business
+(`src/data/contact.ts`). The visitor opens it in Gmail or copies it, and sends it
+themselves. Nothing is sent to a server, and the site cannot tell whether the
+email was sent. Automatic delivery would need a backend or form service.
 
-The privacy notice accurately describes these local-only forms. Before enabling
-message delivery, update it with the business contact, lawful basis, retention,
-recipient/service-provider information and data rights arrangements. Review the
-hosting-related wording for your server as part of that update.
+Update the privacy notice with the lawful basis and retention arrangements, and
+review its hosting-related wording for your server.
 
 Service areas, contact details, pricing, credentials and insurance claims should
 be added only when confirmed. Healthcare work is described as subject to a site
@@ -56,7 +54,7 @@ The site is now a React + TypeScript project built with Vite. npm run build (typ
 
 Structure
 
-Two pages, same URLs. index.html and privacy.html are now small shells: title, meta tags and favicon, plus a script that loads the React page. Existing links to privacy.html and index.html#quote still work.
+One page, one bundle. index.html is a small shell that loads the React app; the privacy notice is shown at `index.html#privacy`.
 Components. The page sections are in src/components/ and the two pages in src/pages/. All the text and CSS classes are unchanged, and site.css was moved without edits.
 Form logic. requests.js is replaced by React code in src/requests/:
 Only one form panel can be open at a time.

@@ -1,3 +1,4 @@
+import { PRIVACY_HASH } from '../lib/routes.ts'
 import { Commercial } from '../components/Commercial.tsx'
 import { Hero } from '../components/Hero.tsx'
 import { Quote } from '../components/Quote.tsx'
@@ -26,7 +27,7 @@ export function HomePage() {
       </main>
       <SiteFooter>
         <a href="#top">Back to top ↑</a>
-        <a href="privacy.html">Privacy notice</a>
+        <a href={PRIVACY_HASH}>Privacy notice</a>
       </SiteFooter>
     </RequestProvider>
   )

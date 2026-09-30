@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { flushSync } from 'react-dom'
-import { requestText } from '../lib/requestText.ts'
+import { CONTACT_EMAIL } from '../data/contact.ts'
+import { PRIVACY_HASH } from '../lib/routes.ts'
+import { buildRequest, requestGmail, type RequestEmail } from '../lib/requestText.ts'
 import type { RequestKind } from './RequestContext.ts'
 
 interface RequestFormProps {
@@ -14,18 +15,17 @@ interface RequestFormProps {
 }
 
 /**
- * Validates the form and prepares a request for the visitor to copy.
+ * Validates the form and prepares an email to R&R Glimzo for the visitor to open in Gmail or copy.
  * Nothing is sent: the text stays on the visitor's device.
  */
 export function RequestForm({ kind, label, intro, submitLabel, preset, children }: RequestFormProps) {
-  const [summary, setSummary] = useState<string | null>(null)
+  const [email, setEmail] = useState<RequestEmail | null>(null)
   const [status, setStatus] = useState('')
   const [prevPreset, setPrevPreset] = useState(preset)
   const summaryRef = useRef<HTMLTextAreaElement>(null)
-  const resultRef = useRef<HTMLDivElement>(null)
 
   const reset = () => {
-    setSummary(null)
+    setEmail(null)
     setStatus('')
   }
 
@@ -39,12 +39,8 @@ export function RequestForm({ kind, label, intro, submitLabel, preset, children 
     event.preventDefault()
     const form = event.currentTarget
     if (!form.reportValidity()) return
-    flushSync(() => {
-      setSummary(requestText(kind, new FormData(form)))
-      setStatus('Request prepared on this device. It has not been sent.')
-    })
-    summaryRef.current?.focus({ preventScroll: true })
-    resultRef.current?.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+    setEmail(buildRequest(kind, new FormData(form)))
+    setStatus('')
   }
 
   const handleCopy = async () => {
@@ -53,7 +49,7 @@ export function RequestForm({ kind, label, intro, submitLabel, preset, children 
     try {
       if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable')
       await navigator.clipboard.writeText(textarea.value)
-      setStatus('Request copied. Paste it into your message to R&R Glimzo. Nothing has been sent automatically.')
+      setStatus(`Request copied. Paste it into an email to ${CONTACT_EMAIL}. Nothing has been sent automatically.`)
     } catch {
       textarea.focus()
       textarea.select()
@@ -73,29 +69,42 @@ export function RequestForm({ kind, label, intro, submitLabel, preset, children 
     >
       <p className="form-intro">{intro}</p>
       <p className="form-info" id={`${kind}-info`}>
-        This form prepares a request on your device. Direct sending is not available yet.{' '}
-        <a href="privacy.html">How your information is handled</a>.
+        This form prepares an email to R&amp;R Glimzo for you to review and send. Direct sending is not available
+        yet. <a href={PRIVACY_HASH}>How your information is handled</a>.
       </p>
       {children}
       <p className="privacy-copy">
-        Please include only contact and property details. Read our <a href="privacy.html">privacy notice</a>.
+        Please include only contact and property details. Read our <a href={PRIVACY_HASH}>privacy notice</a>.
       </p>
       <button className="pill" type="submit">
         {submitLabel}
       </button>
-      <div className="request-result" ref={resultRef} hidden={summary === null}>
-        <h4>Your request is ready to copy</h4>
+      <div className="request-result" hidden={email === null}>
+        <h4>Your request is ready</h4>
         <p className="note">
-          Preparing a request does not send it or confirm a booking. Copy it to use in an email or WhatsApp
-          conversation.
+          Open it in Gmail, or copy it into an email to {CONTACT_EMAIL}. It is only sent when you press send in
+          your email, and it does not confirm a quote, site visit or booking.
         </p>
         <label className="field">
           Your request
-          <textarea className="request-summary" ref={summaryRef} value={summary ?? ''} readOnly spellCheck={false} />
+          <textarea
+            className="request-summary"
+            ref={summaryRef}
+            value={email?.body ?? ''}
+            readOnly
+            spellCheck={false}
+          />
         </label>
-        <button className="pill copy-request" type="button" onClick={handleCopy}>
-          Copy request
-        </button>
+        <div className="request-actions">
+          {email && (
+            <a className="pill" href={requestGmail(email)} target="_blank" rel="noopener noreferrer">
+              Open in Gmail
+            </a>
+          )}
+          <button className="pill copy-request" type="button" onClick={handleCopy}>
+            Copy request
+          </button>
+        </div>
         <div className="copy-status" role="status" aria-live="polite">
           {status}
         </div>

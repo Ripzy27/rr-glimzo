@@ -1,4 +1,85 @@
+import type { ReactNode } from 'react'
+import type { BuildingType } from '../data/options.ts'
 import { RequestLink } from '../requests/RequestLink.tsx'
+
+/** A sector tile either pre-selects a building type in the form or jumps to a specialist section. */
+type Sector = { label: ReactNode } & ({ sector: BuildingType } | { href: string })
+
+const SECTORS: Sector[] = [
+  { label: 'Offices', sector: 'Office' },
+  { label: 'Nurseries', href: '#nursery-cleaning' },
+  { label: 'Factories', sector: 'Factory or industrial premises' },
+  { label: <>Hospitals &amp; healthcare</>, href: '#healthcare-cleaning' },
+  { label: 'Hotels', sector: 'Hotel' },
+  { label: 'Other commercial buildings', sector: 'Other commercial building' },
+]
+
+interface SpecialistProps {
+  id: string
+  kicker: ReactNode
+  title: string
+  intro: string
+  points: string[]
+  scope: string
+  sector: BuildingType
+  action: string
+}
+
+const SPECIALISTS: SpecialistProps[] = [
+  {
+    id: 'nursery-cleaning',
+    kicker: <>Nurseries &amp; early years</>,
+    title: 'A cleaning plan around their day.',
+    intro:
+      'Discuss a cleaning schedule for your nursery with tasks, frequency and responsibilities agreed with your manager.',
+    points: [
+      'Playrooms, floors, tables and frequently touched surfaces.',
+      'Toilets, handwashing and changing areas, with responsibilities clearly agreed.',
+      'Washable toys and equipment, where included, following the manufacturer’s care instructions.',
+      'Daily, weekly and periodic cleaning, with visits planned around children’s attendance.',
+    ],
+    scope:
+      'Before confirming the work, we discuss suitable products, separate equipment for different areas, safe storage and your safeguarding and access arrangements.',
+    sector: 'Nursery or early years setting',
+    action: 'Discuss your nursery',
+  },
+  {
+    id: 'healthcare-cleaning',
+    kicker: <>Hospitals &amp; healthcare</>,
+    title: 'Start with your site’s requirements.',
+    intro:
+      'Healthcare enquiries begin with a discussion with your facilities or infection prevention team to assess the areas and work we can take on.',
+    points: [
+      'Reception areas, offices, corridors and other agreed shared spaces.',
+      'A written schedule defining cleaning tasks, frequency and responsibility.',
+      'Site-approved methods and products, equipment separation and agreed checks.',
+      'Access, staff training and documentation requirements reviewed before a service is agreed.',
+    ],
+    scope:
+      'Clinical areas, isolation rooms, bodily fluid spills and clinical waste require a separate assessment and agreement before any work can be accepted.',
+    sector: 'Hospital or healthcare setting',
+    action: 'Discuss your healthcare site',
+  },
+]
+
+function Specialist({ id, kicker, title, intro, points, scope, sector, action }: SpecialistProps) {
+  return (
+    <article className="specialist" id={id}>
+      <div className="kicker">{kicker}</div>
+      <h3>{title}</h3>
+      <p>{intro}</p>
+      <ul>
+        {points.map(point => (
+          <li key={point}>{point}</li>
+        ))}
+      </ul>
+      <p className="scope">{scope}</p>
+      <RequestLink className="service-action" kind="commercial" sector={sector}>
+        {action}
+      </RequestLink>
+    </article>
+  )
+}
 
 export function Commercial() {
   return (
@@ -17,69 +98,23 @@ export function Commercial() {
             </RequestLink>
           </div>
           <div className="sector-grid">
-            <RequestLink className="sector" kind="commercial" sector="Office">
-              Offices
-            </RequestLink>
-            <a className="sector" href="#nursery-cleaning">
-              Nurseries
-            </a>
-            <RequestLink className="sector" kind="commercial" sector="Factory or industrial premises">
-              Factories
-            </RequestLink>
-            <a className="sector" href="#healthcare-cleaning">
-              Hospitals &amp; healthcare
-            </a>
-            <RequestLink className="sector" kind="commercial" sector="Hotel">
-              Hotels
-            </RequestLink>
-            <RequestLink className="sector" kind="commercial" sector="Other commercial building">
-              Other commercial buildings
-            </RequestLink>
+            {SECTORS.map(item =>
+              'href' in item ? (
+                <a key={item.href} className="sector" href={item.href}>
+                  {item.label}
+                </a>
+              ) : (
+                <RequestLink key={item.sector} className="sector" kind="commercial" sector={item.sector}>
+                  {item.label}
+                </RequestLink>
+              ),
+            )}
           </div>
         </div>
         <div className="specialist-grid">
-          <article className="specialist" id="nursery-cleaning">
-            <div className="kicker">Nurseries &amp; early years</div>
-            <h3>A cleaning plan around their day.</h3>
-            <p>
-              Discuss a cleaning schedule for your nursery with tasks, frequency and responsibilities agreed with your
-              manager.
-            </p>
-            <ul>
-              <li>Playrooms, floors, tables and frequently touched surfaces.</li>
-              <li>Toilets, handwashing and changing areas, with responsibilities clearly agreed.</li>
-              <li>Washable toys and equipment, where included, following the manufacturer’s care instructions.</li>
-              <li>Daily, weekly and periodic cleaning, with visits planned around children’s attendance.</li>
-            </ul>
-            <p className="scope">
-              Before confirming the work, we discuss suitable products, separate equipment for different areas, safe
-              storage and your safeguarding and access arrangements.
-            </p>
-            <RequestLink className="service-action" kind="commercial" sector="Nursery or early years setting">
-              Discuss your nursery
-            </RequestLink>
-          </article>
-          <article className="specialist" id="healthcare-cleaning">
-            <div className="kicker">Hospitals &amp; healthcare</div>
-            <h3>Start with your site’s requirements.</h3>
-            <p>
-              Healthcare enquiries begin with a discussion with your facilities or infection prevention team to assess
-              the areas and work we can take on.
-            </p>
-            <ul>
-              <li>Reception areas, offices, corridors and other agreed shared spaces.</li>
-              <li>A written schedule defining cleaning tasks, frequency and responsibility.</li>
-              <li>Site-approved methods and products, equipment separation and agreed checks.</li>
-              <li>Access, staff training and documentation requirements reviewed before a service is agreed.</li>
-            </ul>
-            <p className="scope">
-              Clinical areas, isolation rooms, bodily fluid spills and clinical waste require a separate assessment and
-              agreement before any work can be accepted.
-            </p>
-            <RequestLink className="service-action" kind="commercial" sector="Hospital or healthcare setting">
-              Discuss your healthcare site
-            </RequestLink>
-          </article>
+          {SPECIALISTS.map(specialist => (
+            <Specialist key={specialist.id} {...specialist} />
+          ))}
         </div>
       </div>
     </section>
