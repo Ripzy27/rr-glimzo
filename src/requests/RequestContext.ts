@@ -1,11 +1,14 @@
 import { createContext, useContext } from 'react'
 import type { BuildingType, DomesticService } from '../data/options.ts'
 
-export type RequestKind = 'domestic' | 'commercial'
+export const REQUEST_KINDS = ['domestic', 'referral', 'commercial'] as const
+
+export type RequestKind = (typeof REQUEST_KINDS)[number]
 
 /** Which request panel to open, optionally pre-selecting its service or building type. */
 export type RequestTarget =
   | { kind: 'domestic'; service?: DomesticService }
+  | { kind: 'referral' }
   | { kind: 'commercial'; sector?: BuildingType }
 
 export interface RequestContextValue {

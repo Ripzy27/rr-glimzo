@@ -10,7 +10,7 @@ interface RequestFormProps {
   intro: string
   submitLabel: string
   /** Pre-selected value from a request link; changing it clears any prepared request. */
-  preset: string
+  preset?: string
   children: ReactNode
 }
 
@@ -18,7 +18,7 @@ interface RequestFormProps {
  * Validates the form and prepares an email to R&R Glimzo for the visitor to open in Gmail or copy.
  * Nothing is sent: the text stays on the visitor's device.
  */
-export function RequestForm({ kind, label, intro, submitLabel, preset, children }: RequestFormProps) {
+export function RequestForm({ kind, label, intro, submitLabel, preset = '', children }: RequestFormProps) {
   const [email, setEmail] = useState<RequestEmail | null>(null)
   const [status, setStatus] = useState('')
   const [prevPreset, setPrevPreset] = useState(preset)
@@ -74,7 +74,7 @@ export function RequestForm({ kind, label, intro, submitLabel, preset, children 
       </p>
       {children}
       <p className="privacy-copy">
-        Please include only contact and property details. Read our <a href={PRIVACY_HASH}>privacy notice</a>.
+        Please include only contact and property details. Read our <a href={PRIVACY_HASH}>privacy policy</a>.
       </p>
       <button className="pill" type="submit">
         {submitLabel}

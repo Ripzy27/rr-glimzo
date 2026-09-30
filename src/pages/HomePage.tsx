@@ -1,11 +1,11 @@
-import { PRIVACY_HASH } from '../lib/routes.ts'
-import { Commercial } from '../components/Commercial.tsx'
-import { Hero } from '../components/Hero.tsx'
-import { Quote } from '../components/Quote.tsx'
-import { Services } from '../components/Services.tsx'
-import { SiteFooter } from '../components/SiteFooter.tsx'
-import { SiteHeader } from '../components/SiteHeader.tsx'
-import { RequestProvider } from '../requests/RequestProvider.tsx'
+import { PRIVACY_HASH, TERMS_HASH } from "../lib/routes.ts";
+import { Commercial } from "../components/Commercial.tsx";
+import { Hero } from "../components/Hero.tsx";
+import { Quote } from "../components/Quote.tsx";
+import { Services } from "../components/Services.tsx";
+import { SiteFooter } from "../components/SiteFooter.tsx";
+import { SiteHeader } from "../components/SiteHeader.tsx";
+import { RequestProvider } from "../requests/RequestProvider.tsx";
 
 export function HomePage() {
   return (
@@ -14,6 +14,9 @@ export function HomePage() {
         <div className="links">
           <a href="#services">Services</a>
           <a href="#commercial">Commercial spaces</a>
+          <a className="secondary-pill" href="#quote">
+            Earn Referal 7%
+          </a>
           <a className="pill" href="#quote">
             Get a quote
           </a>
@@ -27,8 +30,9 @@ export function HomePage() {
       </main>
       <SiteFooter>
         <a href="#top">Back to top ↑</a>
-        <a href={PRIVACY_HASH}>Privacy notice</a>
+        <a href={PRIVACY_HASH}>Privacy policy</a>
+        <a href={TERMS_HASH}>Terms &amp; Conditions</a>
       </SiteFooter>
     </RequestProvider>
-  )
+  );
 }

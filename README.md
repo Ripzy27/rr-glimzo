@@ -26,7 +26,7 @@ subfolder, because asset paths are relative. No server-side runtime is needed.
 ```
 index.html                 Page shell (title, meta, favicon) — Vite entry point
 src/main.tsx               Home page entry
-src/App.tsx                Hash routing between the home and privacy pages (#privacy)
+src/App.tsx                Hash routing between the home, privacy and terms pages
 src/pages/                 HomePage, PrivacyPage
 src/components/            Page sections and form fields
 src/requests/              Request panels/forms: open state, pre-selection, copy flow
@@ -54,7 +54,7 @@ The site is now a React + TypeScript project built with Vite. npm run build (typ
 
 Structure
 
-One page, one bundle. index.html is a small shell that loads the React app; the privacy notice is shown at `index.html#privacy`.
+One page, one bundle. index.html is a small shell that loads the React app; the privacy policy and terms are shown at `index.html#privacy` and `index.html#terms`, rendered from `src/data/legal/`.
 Components. The page sections are in src/components/ and the two pages in src/pages/. All the text and CSS classes are unchanged, and site.css was moved without edits.
 Form logic. requests.js is replaced by React code in src/requests/:
 Only one form panel can be open at a time.

@@ -48,6 +48,26 @@ const KINDS: Record<
       ],
     ],
   },
+  referral: {
+    title: 'Referral',
+    intro:
+      'I would like to refer someone to R&R Glimzo for a cleaning quote. They have agreed to me sharing their details. Both sets of details are below.',
+    subjectKey: 'referee_name',
+    detailsHeading: 'Additional information',
+    sections: [
+      ['Your details', CONTACT_SECTION[1]],
+      [
+        'Person being referred',
+        [
+          ['Name', 'referee_name'],
+          ['Phone', 'referee_phone'],
+          ['Email', 'referee_email'],
+          ['Town or postcode', 'location'],
+          ['Service', 'service'],
+        ],
+      ],
+    ],
+  },
   commercial: {
     title: 'Commercial site visit request',
     intro: 'I would like to arrange a site visit to discuss cleaning for our premises. Our details are below.',

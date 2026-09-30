@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { BuildingType, DomesticService } from '../data/options.ts'
-import { RequestContext, type RequestContextValue, type RequestKind, type RequestTarget } from './RequestContext.ts'
+import {
+  REQUEST_KINDS,
+  RequestContext,
+  type RequestContextValue,
+  type RequestKind,
+  type RequestTarget,
+} from './RequestContext.ts'
 
 function kindFromHash(hash: string): RequestKind | null {
-  if (hash === '#commercial-request') return 'commercial'
-  if (hash === '#domestic-request') return 'domestic'
-  return null
+  return REQUEST_KINDS.find(kind => hash === `#${kind}-request`) ?? null
 }
 
 export function RequestProvider({ children }: { children: ReactNode }) {
-  const [openKind, setOpenKind] = useState<RequestKind | null>('domestic')
+  const [openKind, setOpenKind] = useState<RequestKind | null>(null)
   const [service, setService] = useState<DomesticService | ''>('')
   const [sector, setSector] = useState<BuildingType | ''>('')
   const summaries = useRef<Partial<Record<RequestKind, HTMLElement | null>>>({})

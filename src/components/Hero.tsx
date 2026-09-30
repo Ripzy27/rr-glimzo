@@ -1,5 +1,5 @@
-import logoUrl from '../assets/glimzo-logo.png'
-import { RequestLink } from '../requests/RequestLink.tsx'
+import logoUrl from "../assets/glimzo-logo.png";
+import { RequestLink } from "../requests/RequestLink.tsx";
 
 export function Hero() {
   return (
@@ -14,8 +14,8 @@ export function Hero() {
               <em>You unwind.</em>
             </h1>
             <p>
-              From your home to your workplace, R&amp;R Glimzo takes care of the cleaning so you can focus on
-              everything else.
+              From your home to your workplace, R&amp;R Glimzo takes care of the
+              cleaning so you can focus on everything else.
             </p>
             <div className="actions">
               <RequestLink className="pill" kind="domestic">
@@ -41,8 +41,9 @@ export function Hero() {
           <span>Homes &amp; apartments</span>
           <span>End of tenancy</span>
           <span>Workplaces &amp; facilities</span>
+          <span>Builders Cleaning / Post-Construction Cleaning</span>
         </div>
       </div>
     </>
-  )
+  );
 }
