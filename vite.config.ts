@@ -3,6 +3,10 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react()],
-  // Relative asset URLs, so dist/ works from a domain root or a subfolder.
-  base: './',
+  // Absolute asset URLs: the admin panel lives at a nested path (/0/v1/admin), so relative ones would break there.
+  base: '/',
+  server: {
+    // The API server runs separately in development.
+    proxy: { '/api': 'http://localhost:3001' },
+  },
 })

@@ -1360,3 +1360,32 @@ footer a[aria-current="page"]::after {
 .commercial-inner > * {
   min-width: 0;
 }
+
+/* --- Request form feedback ------------------------------------------------ */
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.request-feedback {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.request-feedback .is-error {
+  color: #a3123a;
+}
+.request-feedback .is-success {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius-s);
+  background: #eaf7ee;
+  color: #1d5c34;
+  animation: panel-in 0.6s var(--ease) both;
+}
+.pill:disabled {
+  opacity: 0.7;
+  cursor: progress;
+  transform: none;
+}

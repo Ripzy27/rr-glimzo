@@ -13,3 +13,6 @@ dist
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+.env
+data
