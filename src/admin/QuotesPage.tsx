@@ -27,18 +27,21 @@ export function QuotesPage({ onSignedOut }: { onSignedOut: () => void }) {
 
       <div className="toolbar">
         <input className="search" type="search" placeholder="Search name, email, phone, details…" value={q} onChange={e => setQ(e.target.value)} aria-label="Search quotes" />
-        <div className="chips" role="group" aria-label="Filter by type">
-          <button className={!kind ? 'is-on' : ''} onClick={() => setKind('')}>All types</button>
+        <select className="filter" value={kind} onChange={e => setKind(e.target.value as QuoteKind | '')} aria-label="Filter by type">
+          <option value="">All types</option>
           {QUOTE_KINDS.map(k => (
-            <button key={k} className={kind === k ? 'is-on' : ''} onClick={() => setKind(k)}>{KIND_LABELS[k]}</button>
+            <option key={k} value={k}>{KIND_LABELS[k]}</option>
           ))}
-        </div>
-        <div className="chips" role="group" aria-label="Filter by status">
-          <button className={!status ? 'is-on' : ''} onClick={() => setStatus('')}>Any status</button>
+        </select>
+        <select className="filter" value={status} onChange={e => setStatus(e.target.value as QuoteStatus | '')} aria-label="Filter by status">
+          <option value="">Any status</option>
           {QUOTE_STATUSES.map(s => (
-            <button key={s} className={status === s ? 'is-on' : ''} onClick={() => setStatus(s)}>{STATUS_LABELS[s]}</button>
+            <option key={s} value={s}>{STATUS_LABELS[s]}</option>
           ))}
-        </div>
+        </select>
+        {filtered && (
+          <button className="link-btn" onClick={() => (setQ(''), setKind(''), setStatus(''))}>Clear filters</button>
+        )}
       </div>
 
       {error && (

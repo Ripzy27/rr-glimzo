@@ -88,3 +88,18 @@ export const ImageIcon = () => (
     <path d="m4 17 5-4.5 4 3.5 3-2.5 4 3.5" />
   </Svg>
 )
+
+export const ListIcon = () => (
+  <Svg>
+    <rect x="4" y="4" width="16" height="6" rx="1.5" />
+    <rect x="4" y="14" width="16" height="6" rx="1.5" />
+  </Svg>
+)
+
+export const BoardIcon = () => (
+  <Svg>
+    <rect x="4" y="4" width="4.5" height="16" rx="1.2" />
+    <rect x="9.75" y="4" width="4.5" height="10" rx="1.2" />
+    <rect x="15.5" y="4" width="4.5" height="13" rx="1.2" />
+  </Svg>
+)
