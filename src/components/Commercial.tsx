@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react'
 import type { BuildingType } from '../data/options.ts'
 import { RequestLink } from '../requests/RequestLink.tsx'
+import { ArrowIcon, FactoryIcon, GridIcon, HealthIcon, HotelIcon, ImageIcon, NurseryIcon, OfficeIcon } from './Icons.tsx'
+import { Photo, Reveal } from './Reveal.tsx'
 
 /** A sector tile either pre-selects a building type in the form or jumps to a specialist section. */
-type Sector = { label: ReactNode } & ({ sector: BuildingType } | { href: string })
+type Sector = { label: ReactNode; icon: ReactNode } & ({ sector: BuildingType } | { href: string })
 
 const SECTORS: Sector[] = [
-  { label: 'Offices', sector: 'Office' },
-  { label: 'Nurseries', href: '#nursery-cleaning' },
-  { label: 'Factories', sector: 'Factory or industrial premises' },
-  { label: <>Hospitals &amp; healthcare</>, href: '#healthcare-cleaning' },
-  { label: 'Hotels', sector: 'Hotel' },
-  { label: 'Other commercial buildings', sector: 'Other commercial building' },
+  { label: 'Offices', icon: <OfficeIcon />, sector: 'Office' },
+  { label: 'Nurseries', icon: <NurseryIcon />, href: '#nursery-cleaning' },
+  { label: 'Factories', icon: <FactoryIcon />, sector: 'Factory or industrial premises' },
+  { label: <>Hospitals &amp; healthcare</>, icon: <HealthIcon />, href: '#healthcare-cleaning' },
+  { label: 'Hotels', icon: <HotelIcon />, sector: 'Hotel' },
+  { label: 'Other commercial buildings', icon: <GridIcon />, sector: 'Other commercial building' },
 ]
 
 interface SpecialistProps {
@@ -76,6 +78,7 @@ function Specialist({ id, kicker, title, intro, points, scope, sector, action }:
       <p className="scope">{scope}</p>
       <RequestLink className="service-action" kind="commercial" sector={sector}>
         {action}
+        <ArrowIcon />
       </RequestLink>
     </article>
   )
@@ -86,7 +89,7 @@ export function Commercial() {
     <section id="commercial" className="commercial">
       <div className="wrap">
         <div className="commercial-inner">
-          <div>
+          <Reveal>
             <div className="kicker">Commercial spaces</div>
             <h2>Every building has its own rhythm.</h2>
             <p className="intro">
@@ -95,25 +98,39 @@ export function Commercial() {
             </p>
             <RequestLink className="pill" kind="commercial">
               Request a commercial site visit
+              <ArrowIcon />
             </RequestLink>
-          </div>
+            {/*
+              PHOTO PLACEHOLDER (replace with <img>, ~16:10, cool-warm daylight):
+              A calm, freshly cleaned open-plan office in late afternoon light, with polished floors and no people in frame.
+            */}
+            <Photo className="commercial-photo">
+              <ImageIcon />
+            </Photo>
+          </Reveal>
           <div className="sector-grid">
-            {SECTORS.map(item =>
-              'href' in item ? (
-                <a key={item.href} className="sector" href={item.href}>
-                  {item.label}
-                </a>
-              ) : (
-                <RequestLink key={item.sector} className="sector" kind="commercial" sector={item.sector}>
-                  {item.label}
-                </RequestLink>
-              ),
-            )}
+            {SECTORS.map((item, index) => (
+              <Reveal key={index} delay={index * 60}>
+                {'href' in item ? (
+                  <a className="sector" href={item.href}>
+                    {item.icon}
+                    {item.label}
+                  </a>
+                ) : (
+                  <RequestLink className="sector" kind="commercial" sector={item.sector}>
+                    {item.icon}
+                    {item.label}
+                  </RequestLink>
+                )}
+              </Reveal>
+            ))}
           </div>
         </div>
         <div className="specialist-grid">
-          {SPECIALISTS.map(specialist => (
-            <Specialist key={specialist.id} {...specialist} />
+          {SPECIALISTS.map((specialist, index) => (
+            <Reveal key={specialist.id} delay={index * 100}>
+              <Specialist {...specialist} />
+            </Reveal>
           ))}
         </div>
       </div>
