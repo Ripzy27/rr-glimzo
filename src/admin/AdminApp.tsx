@@ -1,6 +1,6 @@
 import { useCallback, type ReactNode, useEffect, useState, useSyncExternalStore } from 'react'
 import { BoardIcon, ListIcon } from '../components/Icons.tsx'
-import { api } from '../lib/api.ts'
+import { adminToken, api } from '../lib/api.ts'
 import { ADMIN_BASE } from './paths.ts'
 import { BoardPage } from './BoardPage.tsx'
 import { Login } from './Login.tsx'
@@ -23,18 +23,19 @@ type Session = 'checking' | 'in' | 'out'
 /** The private admin area, served at /0/v1/admin. Everything inside requires the admin login. */
 export function AdminApp() {
   const path = useSyncExternalStore(subscribe, () => location.pathname.replace(/\/+$/, ''))
-  const [session, setSession] = useState<Session>('checking')
+  const [session, setSession] = useState<Session>(() => (adminToken.get() ? 'checking' : 'out'))
 
   useEffect(() => {
     document.title = 'Admin | R&R Glimzo'
+    if (!adminToken.get()) return
     api<{ authenticated: boolean }>('/admin/me')
       .then(r => setSession(r.authenticated ? 'in' : 'out'))
       .catch(() => setSession('out'))
   }, [])
 
   const signedOut = useCallback(() => setSession('out'), [])
-  const logout = async () => {
-    await api('/admin/logout', { method: 'POST', body: {} }).catch(() => {})
+  const logout = () => {
+    adminToken.clear()
     setSession('out')
   }
 

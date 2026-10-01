@@ -18,11 +18,20 @@ npm run lint
 ## Admin panel and API
 
 Requests from the forms are stored by the separate API in the `rr-glimzo-server` repo (Express + PostgreSQL).
-Start it first (see its README), then `npm run dev` here: Vite proxies `/api` to `http://localhost:3001`
-(override with `API_URL`).
+
+- **Development:** start the API, then `npm run dev` here. Vite proxies `/api` to `http://localhost:3001` (override with `API_URL`).
+- **Production:** the API can be on a different host. Set `VITE_API_URL=https://your-api-host` when building
+  (see `.env.example`), and add this site's origin to `CORS_ORIGIN` on the API.
 
 The admin panel is part of this app, at `/0/v1/admin` (quotes as cards) and `/0/v1/admin/board`
-(drag-and-drop board: Pending → Discussion ongoing → Confirmed → Done). It signs in through the API.
+(drag-and-drop board: Pending → Discussion ongoing → Confirmed → Done). It signs in through the API and keeps
+the session token in the browser tab (`sessionStorage`), so closing the tab signs you out.
+
+## Deploying
+
+`npm run build` produces a static site in `dist/`. Host it anywhere that serves static files, with every unknown path
+falling back to `index.html` (needed for `/0/v1/admin`). Static hosts without that fallback (e.g. GitHub Pages) need a
+`404.html` copy of `index.html`.
 
 ## Project layout
 

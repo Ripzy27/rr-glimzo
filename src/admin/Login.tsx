@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { api } from '../lib/api.ts'
+import { adminToken, api } from '../lib/api.ts'
 
 export function Login({ onSignedIn }: { onSignedIn: () => void }) {
   const [busy, setBusy] = useState(false)
@@ -11,7 +11,11 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
     setBusy(true)
     setError('')
     try {
-      await api('/admin/login', { method: 'POST', body: { email: data.get('email'), password: data.get('password') } })
+      const { token } = await api<{ token: string }>('/admin/login', {
+        method: 'POST',
+        body: { email: data.get('email'), password: data.get('password') },
+      })
+      adminToken.set(token)
       onSignedIn()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
