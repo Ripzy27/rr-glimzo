@@ -224,7 +224,7 @@
   color: var(--plum);
   transform: translateX(2px);
 }
-.side-nav a.is-active {
+.side-nav a.active {
   background: var(--lilac);
   color: var(--plum);
 }

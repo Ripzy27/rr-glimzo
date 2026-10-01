@@ -1,4 +1,5 @@
-import { useCallback, type ReactNode, useEffect, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import { BoardIcon, ListIcon } from '../components/Icons.tsx'
 import { adminToken, api } from '../lib/api.ts'
 import { ADMIN_BASE } from './paths.ts'
@@ -7,22 +8,10 @@ import { Login } from './Login.tsx'
 import { QuotesPage } from './QuotesPage.tsx'
 import './admin.css'
 
-const subscribe = (cb: () => void) => {
-  window.addEventListener('popstate', cb)
-  return () => window.removeEventListener('popstate', cb)
-}
-
-function navigate(to: string) {
-  history.pushState(null, '', to)
-  window.dispatchEvent(new PopStateEvent('popstate'))
-  window.scrollTo(0, 0)
-}
-
 type Session = 'checking' | 'in' | 'out'
 
 /** The private admin area, served at /0/v1/admin. Everything inside requires the admin login. */
 export function AdminApp() {
-  const path = useSyncExternalStore(subscribe, () => location.pathname.replace(/\/+$/, ''))
   const [session, setSession] = useState<Session>(() => (adminToken.get() ? 'checking' : 'out'))
 
   useEffect(() => {
@@ -42,39 +31,26 @@ export function AdminApp() {
   if (session === 'checking') return <div className="admin admin-center"><div className="spinner" aria-label="Loading" /></div>
   if (session === 'out') return <Login onSignedIn={() => setSession('in')} />
 
-  const onBoard = path === `${ADMIN_BASE}/board`
-  const link = (to: string, label: string, icon: ReactNode, active: boolean) => (
-    <a
-      href={to}
-      className={active ? 'is-active' : ''}
-      aria-current={active ? 'page' : undefined}
-      onClick={e => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return
-        e.preventDefault()
-        navigate(to)
-      }}
-    >
-      {icon}
-      {label}
-    </a>
-  )
-
   return (
     <div className="admin admin-layout">
       <aside className="sidebar">
-        <a className="brand" href={ADMIN_BASE} onClick={e => (e.preventDefault(), navigate(ADMIN_BASE))}>
+        <Link className="brand" to={ADMIN_BASE}>
           <span className="brand-mark" aria-hidden="true">R</span>
           <span className="brand-name">R&amp;R <span>Glimzo</span></span>
-        </a>
+        </Link>
         <span className="admin-tag">Admin</span>
         <nav className="side-nav" aria-label="Admin">
-          {link(ADMIN_BASE, 'Quotes', <ListIcon />, !onBoard)}
-          {link(`${ADMIN_BASE}/board`, 'Board', <BoardIcon />, onBoard)}
+          <NavLink to={ADMIN_BASE} end><ListIcon />Quotes</NavLink>
+          <NavLink to={`${ADMIN_BASE}/board`}><BoardIcon />Board</NavLink>
         </nav>
         <button className="btn btn-quiet side-out" onClick={logout}>Sign out</button>
       </aside>
       <main className="admin-main">
-        {onBoard ? <BoardPage onSignedOut={signedOut} /> : <QuotesPage onSignedOut={signedOut} />}
+        <Routes>
+          <Route index element={<QuotesPage onSignedOut={signedOut} />} />
+          <Route path="board" element={<BoardPage onSignedOut={signedOut} />} />
+          <Route path="*" element={<Navigate to={ADMIN_BASE} replace />} />
+        </Routes>
       </main>
     </div>
   )

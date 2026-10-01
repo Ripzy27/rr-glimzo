@@ -1,41 +1,57 @@
-import { lazy, Suspense, useEffect, useSyncExternalStore } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { ADMIN_BASE } from "./admin/paths.ts";
 import { PRIVACY_POLICY } from "./data/legal/privacy.ts";
 import { TERMS_AND_CONDITIONS } from "./data/legal/terms.ts";
-import { PRIVACY_HASH, TERMS_HASH } from "./lib/routes.ts";
+import { PRIVACY_PATH, TERMS_PATH } from "./lib/routes.ts";
 import { HomePage } from "./pages/HomePage.tsx";
 import { LegalPage } from "./pages/LegalPage.tsx";
 
 const AdminApp = lazy(() => import("./admin/AdminApp.tsx").then((m) => ({ default: m.AdminApp })));
-const isAdminPath = () => location.pathname === ADMIN_BASE || location.pathname.startsWith(`${ADMIN_BASE}/`);
 
 const HOME_TITLE = document.title;
 
-const subscribe = (onChange: () => void) => {
-  window.addEventListener("hashchange", onChange);
-  return () => window.removeEventListener("hashchange", onChange);
-};
+/** Old links used #privacy and #terms; send them to the real pages. */
+const LEGACY_HASHES: Record<string, string> = { "#privacy": PRIVACY_PATH, "#terms": TERMS_PATH };
 
-/** Only the legal pages are routes; every other hash is an anchor on the home page. */
-const currentPage = () => (location.hash === PRIVACY_HASH || location.hash === TERMS_HASH ? location.hash : "");
-
-/** Switches between the site's pages by URL hash, so the site needs no server-side routing. */
-export function App() {
-  if (isAdminPath()) return <Suspense fallback={null}><AdminApp /></Suspense>;
-  return <Site />;
-}
-
-function Site() {
-  const page = useSyncExternalStore(subscribe, currentPage);
-  const legal = page === PRIVACY_HASH ? PRIVACY_POLICY : page === TERMS_HASH ? TERMS_AND_CONDITIONS : null;
-
-  // Browsers scroll to a hash before the new page renders, so scroll again once it has.
+/** Resets scroll and the document title on navigation; the browser does neither for client-side routes. */
+function PageEffects() {
+  const { pathname, hash } = useLocation();
   useEffect(() => {
-    document.title = legal ? `${legal.title} | R&R Glimzo` : HOME_TITLE;
-    const target = legal ? null : document.getElementById(location.hash.slice(1));
+    if (pathname === PRIVACY_PATH) document.title = `${PRIVACY_POLICY.title} | R&R Glimzo`;
+    else if (pathname === TERMS_PATH) document.title = `${TERMS_AND_CONDITIONS.title} | R&R Glimzo`;
+    else if (!pathname.startsWith(ADMIN_BASE)) document.title = HOME_TITLE;
+    const target = hash ? document.getElementById(hash.slice(1)) : null;
     if (target) target.scrollIntoView();
     else window.scrollTo(0, 0);
-  }, [legal]);
+  }, [pathname, hash]);
+  return null;
+}
 
-  return legal ? <LegalPage document={legal} hash={page} /> : <HomePage />;
+export function App() {
+  return (
+    <BrowserRouter>
+      <PageEffects />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path={PRIVACY_PATH} element={<LegalPage document={PRIVACY_POLICY} />} />
+        <Route path={TERMS_PATH} element={<LegalPage document={TERMS_AND_CONDITIONS} />} />
+        <Route
+          path={`${ADMIN_BASE}/*`}
+          element={
+            <Suspense fallback={null}>
+              <AdminApp />
+            </Suspense>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function Home() {
+  const { hash } = useLocation();
+  const legacy = LEGACY_HASHES[hash];
+  return legacy ? <Navigate to={legacy} replace /> : <HomePage />;
 }

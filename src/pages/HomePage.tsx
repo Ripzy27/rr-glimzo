@@ -1,4 +1,5 @@
-import { PRIVACY_HASH, TERMS_HASH } from "../lib/routes.ts";
+import { Link } from "react-router-dom";
+import { PRIVACY_PATH, TERMS_PATH } from "../lib/routes.ts";
 import { Commercial } from "../components/Commercial.tsx";
 import { Hero } from "../components/Hero.tsx";
 import { Quote } from "../components/Quote.tsx";
@@ -30,8 +31,8 @@ export function HomePage() {
       </main>
       <SiteFooter>
         <a href="#top">Back to top ↑</a>
-        <a href={PRIVACY_HASH}>Privacy policy</a>
-        <a href={TERMS_HASH}>Terms &amp; Conditions</a>
+        <Link to={PRIVACY_PATH}>Privacy policy</Link>
+        <Link to={TERMS_PATH}>Terms &amp; Conditions</Link>
       </SiteFooter>
     </RequestProvider>
   );

@@ -1,7 +1,7 @@
 # R&R Glimzo website
 
 Marketing site for R&R Glimzo, built with React, TypeScript and Vite.
-It has two pages: the home page with the domestic and commercial request forms, and the privacy notice.
+Routing uses react-router-dom: `/` (home with the request forms), `/privacy`, `/terms` and the admin panel under `/0/v1/admin`.
 
 ## Development
 

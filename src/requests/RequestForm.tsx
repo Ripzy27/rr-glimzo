@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { PRIVACY_HASH } from '../lib/routes.ts'
+import { Link } from 'react-router-dom'
+import { PRIVACY_PATH } from '../lib/routes.ts'
 import { ApiError, submitQuote } from '../lib/api.ts'
 import { CONTACT_KEYS } from '../shared/quotes.ts'
 import type { RequestKind } from './RequestContext.ts'
@@ -72,13 +73,13 @@ export function RequestForm({ kind, label, intro, submitLabel, preset = '', chil
       <p className="form-intro">{intro}</p>
       <p className="form-info" id={`${kind}-info`}>
         This form sends your request to R&amp;R Glimzo, who will contact you to discuss it.{' '}
-        <a href={PRIVACY_HASH}>How your information is handled</a>.
+        <Link to={PRIVACY_PATH}>How your information is handled</Link>.
       </p>
       {children}
       {/* Honeypot: hidden from people, filled in by simple bots. */}
       <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       <p className="privacy-copy">
-        Please include only contact and property details. Read our <a href={PRIVACY_HASH}>privacy policy</a>.
+        Please include only contact and property details. Read our <Link to={PRIVACY_PATH}>privacy policy</Link>.
       </p>
       <button className="pill" type="submit" disabled={state === 'sending'}>
         {state === 'sending' ? 'Sending…' : submitLabel}
