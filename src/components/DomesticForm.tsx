@@ -11,7 +11,7 @@ export function DomesticForm() {
       kind="domestic"
       label="Domestic quote request"
       intro="Tell us what your home needs."
-      submitLabel="Prepare domestic request"
+      submitLabel="Send domestic request"
       preset={service}
     >
       <ContactFields kind="domestic" />

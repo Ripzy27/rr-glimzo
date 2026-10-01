@@ -1,5 +1,6 @@
 import { RequestLink } from "../requests/RequestLink.tsx";
 import { RequestPanel } from "../requests/RequestPanel.tsx";
+import { Reveal } from "./Reveal.tsx";
 import { CommercialForm } from "./CommercialForm.tsx";
 import { DomesticForm } from "./DomesticForm.tsx";
 import { ReferralForm } from "./ReferralForm.tsx";
@@ -8,7 +9,7 @@ export function Quote() {
   return (
     <section id="quote" className="quote">
       <div className="wrap quote-inner">
-        <div>
+        <Reveal className="quote-copy">
           <div className="kicker">Domestic &amp; commercial enquiries</div>
           <h2>Let’s plan your clean.</h2>
           <p>
@@ -31,8 +32,8 @@ export function Quote() {
             </RequestLink>
           </div>
           <p>Site visits and cleaning dates are subject to confirmation.</p>
-        </div>
-        <div className="request-stack">
+        </Reveal>
+        <Reveal className="request-stack" delay={120}>
           <RequestPanel kind="domestic" title="Request a domestic quote">
             <DomesticForm />
           </RequestPanel>
@@ -45,7 +46,7 @@ export function Quote() {
           >
             <CommercialForm />
           </RequestPanel>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

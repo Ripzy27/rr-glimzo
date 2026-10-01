@@ -9,7 +9,7 @@ export function ReferralForm() {
       kind="referral"
       label="Referral request"
       intro="Refer a customer to R&R Glimzo and earn up to 7% of the qualifying cleaning charge. Your referral must be registered and the applicable commission rate agreed with us in writing before you introduce the customer. Commission becomes payable only after the customer has accepted our quotation, R&R Glimzo has confirmed the booking, the agreed cleaning work has been completed and we have received full cleared payment. Acceptance of a quotation alone does not trigger payment. Commission is calculated on the agreed cleaning charge actually received, excluding VAT, discounts and refunded amounts. Cancelled or unpaid jobs do not qualify. Rewards apply to the specific job covered by your referral agreement."
-      submitLabel="Prepare referral"
+      submitLabel="Send referral"
     >
       <ContactFields kind="referral" />
       <fieldset>

@@ -11,7 +11,7 @@ export function CommercialForm() {
       kind="commercial"
       label="Commercial site visit request"
       intro="Share a few details so we can discuss a visit and prepare a cleaning proposal."
-      submitLabel="Prepare site visit request"
+      submitLabel="Send site visit request"
       preset={sector}
     >
       <ContactFields kind="commercial" />

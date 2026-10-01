@@ -1,9 +1,13 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { lazy, Suspense, useEffect, useSyncExternalStore } from "react";
+import { ADMIN_BASE } from "./admin/paths.ts";
 import { PRIVACY_POLICY } from "./data/legal/privacy.ts";
 import { TERMS_AND_CONDITIONS } from "./data/legal/terms.ts";
 import { PRIVACY_HASH, TERMS_HASH } from "./lib/routes.ts";
 import { HomePage } from "./pages/HomePage.tsx";
 import { LegalPage } from "./pages/LegalPage.tsx";
+
+const AdminApp = lazy(() => import("./admin/AdminApp.tsx").then((m) => ({ default: m.AdminApp })));
+const isAdminPath = () => location.pathname === ADMIN_BASE || location.pathname.startsWith(`${ADMIN_BASE}/`);
 
 const HOME_TITLE = document.title;
 
@@ -17,6 +21,11 @@ const currentPage = () => (location.hash === PRIVACY_HASH || location.hash === T
 
 /** Switches between the site's pages by URL hash, so the site needs no server-side routing. */
 export function App() {
+  if (isAdminPath()) return <Suspense fallback={null}><AdminApp /></Suspense>;
+  return <Site />;
+}
+
+function Site() {
   const page = useSyncExternalStore(subscribe, currentPage);
   const legal = page === PRIVACY_HASH ? PRIVACY_POLICY : page === TERMS_HASH ? TERMS_AND_CONDITIONS : null;
 

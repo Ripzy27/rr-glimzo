@@ -1,7 +1,7 @@
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { CONTACT_EMAIL } from '../data/contact.ts'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import { PRIVACY_HASH } from '../lib/routes.ts'
-import { buildRequest, requestGmail, type RequestEmail } from '../lib/requestText.ts'
+import { ApiError, submitQuote } from '../lib/api.ts'
+import { CONTACT_KEYS } from '../shared/quotes.ts'
 import type { RequestKind } from './RequestContext.ts'
 
 interface RequestFormProps {
@@ -9,51 +9,53 @@ interface RequestFormProps {
   label: string
   intro: string
   submitLabel: string
-  /** Pre-selected value from a request link; changing it clears any prepared request. */
+  /** Pre-selected value from a request link; changing it clears any sent confirmation. */
   preset?: string
   children: ReactNode
 }
 
+/** Form values that are not part of the request itself. */
+const IGNORED = new Set(['consent', 'website'])
+
 /**
- * Validates the form and prepares an email to R&R Glimzo for the visitor to open in Gmail or copy.
- * Nothing is sent: the text stays on the visitor's device.
+ * Validates the form and sends the request to the R&R Glimzo server, where it is stored for the team to follow up.
  */
 export function RequestForm({ kind, label, intro, submitLabel, preset = '', children }: RequestFormProps) {
-  const [email, setEmail] = useState<RequestEmail | null>(null)
-  const [status, setStatus] = useState('')
+  const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [error, setError] = useState('')
   const [prevPreset, setPrevPreset] = useState(preset)
-  const summaryRef = useRef<HTMLTextAreaElement>(null)
 
   const reset = () => {
-    setEmail(null)
-    setStatus('')
+    setState('idle')
+    setError('')
   }
 
-  // A request link changed the pre-selected field: the prepared text is out of date.
+  // A request link changed the pre-selected field: any earlier confirmation is out of date.
   if (preset !== prevPreset) {
     setPrevPreset(preset)
     reset()
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const form = event.currentTarget
-    if (!form.reportValidity()) return
-    setEmail(buildRequest(kind, new FormData(form)))
-    setStatus('')
-  }
-
-  const handleCopy = async () => {
-    const textarea = summaryRef.current
-    if (!textarea) return
+    if (!form.reportValidity() || state === 'sending') return
+    const data = new FormData(form)
+    const get = (key: string) => String(data.get(key) ?? '').trim()
+    const fields: Record<string, string> = {}
+    for (const [key, value] of data.entries()) {
+      if (IGNORED.has(key) || (CONTACT_KEYS as readonly string[]).includes(key) || typeof value !== 'string') continue
+      if (value.trim()) fields[key] = value.trim()
+    }
+    setState('sending')
+    setError('')
     try {
-      if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable')
-      await navigator.clipboard.writeText(textarea.value)
-      setStatus(`Request copied. Paste it into an email to ${CONTACT_EMAIL}. Nothing has been sent automatically.`)
-    } catch {
-      textarea.focus()
-      textarea.select()
-      setStatus('Automatic copying is unavailable. Your request is selected; use your device’s Copy command.')
+      await submitQuote({ kind, name: get('name'), email: get('email'), phone: get('phone'), fields, website: get('website') })
+      form.reset()
+      setState('sent')
+    } catch (err) {
+      setState('idle')
+      setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.')
     }
   }
 
@@ -64,50 +66,30 @@ export function RequestForm({ kind, label, intro, submitLabel, preset = '', chil
       aria-describedby={`${kind}-info`}
       method="post"
       onSubmit={handleSubmit}
-      // Any edit makes the prepared text out of date. The summary is read-only, so it never fires this.
-      onChange={reset}
+      // Any edit after sending starts a fresh request.
+      onChange={() => state === 'sent' && reset()}
     >
       <p className="form-intro">{intro}</p>
       <p className="form-info" id={`${kind}-info`}>
-        This form prepares an email to R&amp;R Glimzo for you to review and send. Direct sending is not available
-        yet. <a href={PRIVACY_HASH}>How your information is handled</a>.
+        This form sends your request to R&amp;R Glimzo, who will contact you to discuss it.{' '}
+        <a href={PRIVACY_HASH}>How your information is handled</a>.
       </p>
       {children}
+      {/* Honeypot: hidden from people, filled in by simple bots. */}
+      <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       <p className="privacy-copy">
         Please include only contact and property details. Read our <a href={PRIVACY_HASH}>privacy policy</a>.
       </p>
-      <button className="pill" type="submit">
-        {submitLabel}
+      <button className="pill" type="submit" disabled={state === 'sending'}>
+        {state === 'sending' ? 'Sending…' : submitLabel}
       </button>
-      <div className="request-result" hidden={email === null}>
-        <h4>Your request is ready</h4>
-        <p className="note">
-          Open it in Gmail, or copy it into an email to {CONTACT_EMAIL}. It is only sent when you press send in
-          your email, and it does not confirm a quote, site visit or booking.
-        </p>
-        <label className="field">
-          Your request
-          <textarea
-            className="request-summary"
-            ref={summaryRef}
-            value={email?.body ?? ''}
-            readOnly
-            spellCheck={false}
-          />
-        </label>
-        <div className="request-actions">
-          {email && (
-            <a className="pill" href={requestGmail(email)} target="_blank" rel="noopener noreferrer">
-              Open in Gmail
-            </a>
-          )}
-          <button className="pill copy-request" type="button" onClick={handleCopy}>
-            Copy request
-          </button>
-        </div>
-        <div className="copy-status" role="status" aria-live="polite">
-          {status}
-        </div>
+      <div className="copy-status request-feedback" role="status" aria-live="polite">
+        {error && <span className="is-error">{error}</span>}
+        {state === 'sent' && (
+          <span className="is-success">
+            Thank you, your request has been sent. We will be in touch to discuss it. Dates are subject to confirmation.
+          </span>
+        )}
       </div>
     </form>
   )
