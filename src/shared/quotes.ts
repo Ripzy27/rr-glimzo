@@ -1,6 +1,6 @@
 /**
- * Quote model shared by the website, the admin panel and the API server.
- * Keep this file free of browser and Node imports; the server loads it directly.
+ * Quote model used by the website and the admin panel.
+ * The API (rr-glimzo-server) keeps its own copy in src/quotes.ts, with the input validation; keep the two in step.
  */
 
 export const QUOTE_KINDS = ['domestic', 'referral', 'commercial'] as const
@@ -99,53 +99,6 @@ export interface QuoteInput {
   fields?: Record<string, string>
   notes?: string
   status?: QuoteStatus
-}
-
-export const MAX_FIELD_LENGTH = 2500
-
-const isString = (v: unknown): v is string => typeof v === 'string'
-
-/** Checks and trims untrusted input. Returns the clean value or a message for the first problem. */
-export function parseQuoteInput(raw: unknown, { partial = false } = {}): { ok: true; value: Partial<QuoteInput> } | { ok: false; error: string } {
-  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return { ok: false, error: 'Invalid request.' }
-  const body = raw as Record<string, unknown>
-  const out: Partial<QuoteInput> = {}
-
-  if (body.kind !== undefined || !partial) {
-    if (!QUOTE_KINDS.includes(body.kind as QuoteKind)) return { ok: false, error: 'Unknown request type.' }
-    out.kind = body.kind as QuoteKind
-  }
-  for (const key of ['name', 'email', 'phone', 'notes'] as const) {
-    const v = body[key]
-    if (v === undefined && (partial || key === 'phone' || key === 'notes')) continue
-    if (!isString(v)) return { ok: false, error: `Invalid ${key}.` }
-    const t = v.trim()
-    if (t.length > (key === 'notes' ? MAX_FIELD_LENGTH : 254)) return { ok: false, error: `${key} is too long.` }
-    out[key] = t
-  }
-  if (out.name !== undefined && !out.name) return { ok: false, error: 'Name is required.' }
-  if (out.email !== undefined && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) return { ok: false, error: 'Enter a valid email address.' }
-
-  if (body.status !== undefined) {
-    if (!QUOTE_STATUSES.includes(body.status as QuoteStatus)) return { ok: false, error: 'Unknown status.' }
-    out.status = body.status as QuoteStatus
-  }
-  if (body.fields !== undefined) {
-    if (typeof body.fields !== 'object' || body.fields === null || Array.isArray(body.fields)) return { ok: false, error: 'Invalid fields.' }
-    // On create the kind is known; on edit the caller passes it or the server checks against the stored kind.
-    const kind = out.kind ?? (body.kind as QuoteKind | undefined)
-    const allowed = kind ? new Set(QUOTE_FIELDS[kind].map(f => f.key)) : null
-    const fields: Record<string, string> = {}
-    for (const [key, v] of Object.entries(body.fields)) {
-      if (allowed && !allowed.has(key)) continue
-      if (!isString(v)) return { ok: false, error: `Invalid ${key}.` }
-      const t = v.trim()
-      if (t.length > MAX_FIELD_LENGTH) return { ok: false, error: `${key} is too long.` }
-      if (t) fields[key] = t
-    }
-    out.fields = fields
-  }
-  return { ok: true, value: out }
 }
 
 /** A short headline for a quote card: what the request is about. */

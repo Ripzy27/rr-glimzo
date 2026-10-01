@@ -15,23 +15,14 @@ npm run preview   # serve the built dist/ locally
 npm run lint
 ```
 
-## Running with the API and admin panel
+## Admin panel and API
 
-Requests from the website forms are stored by a small Node server (Express + SQLite, `server/`).
-Needs Node 22.18+.
+Requests from the forms are stored by the separate API in the `rr-glimzo-server` repo (Express + PostgreSQL).
+Start it first (see its README), then `npm run dev` here: Vite proxies `/api` to `http://localhost:3001`
+(override with `API_URL`).
 
-```sh
-cp .env.example .env     # set ADMIN_EMAIL, ADMIN_PASSWORD and SESSION_SECRET
-npm run dev              # Vite on :5173 (proxies /api) + API on :3001
-```
-
-Production: `npm run build`, then `npm run server`. The server serves `dist/` and the API on one port
-(`PORT`, default 3001); put it behind HTTPS and set `TRUST_PROXY=true` if behind a proxy.
-The database is a single file (`DB_PATH`, default `data/glimzo.db`); back it up.
-
-The admin panel is at `/0/v1/admin` (quotes as cards) and `/0/v1/admin/board` (drag-and-drop board:
-Pending → Discussion ongoing → Confirmed → Done). Sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
-Quotes can be created, viewed, edited and deleted there.
+The admin panel is part of this app, at `/0/v1/admin` (quotes as cards) and `/0/v1/admin/board`
+(drag-and-drop board: Pending → Discussion ongoing → Confirmed → Done). It signs in through the API.
 
 ## Project layout
 
@@ -45,7 +36,6 @@ src/requests/              Request panels/forms: open state, pre-selection, copy
 src/lib/api.ts             Fetch helper for the API
 src/shared/quotes.ts       Quote model and validation shared by site, admin and server
 src/admin/                 Admin panel (login, quotes cards, board)
-server/                    API server (Express + SQLite)
 src/data/options.ts        Services, building types and other select options
 src/styles/site.css        All styling and responsive layouts
 src/assets/                Logo

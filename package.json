@@ -4,32 +4,22 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n web,api \"vite\" \"npm run server:dev\"",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "dev:web": "vite",
-    "server": "NODE_ENV=production node --env-file-if-exists=.env server/index.ts",
-    "server:dev": "node --watch --env-file-if-exists=.env server/index.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
-    "concurrently": "^10.0.5",
     "oxlint": "^1.81.0",
-    "tsx": "^4.23.15",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
-  },
-  "engines": {
-    "node": ">=22.18"
   }
 }
